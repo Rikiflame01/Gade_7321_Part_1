@@ -15,7 +15,6 @@ public class PlayerMovement : MonoBehaviour
         // Bind the movement action
         controls.Player.WASD.performed += ctx =>
         {
-            Debug.Log("Move performed");
             // Ensure moveInput and other operations are valid here.
             moveInput = ctx.ReadValue<Vector2>();
         };

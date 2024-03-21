@@ -5,7 +5,7 @@ using UnityEngine;
 // Base Node
 public abstract class BTNode
 {
-    public abstract bool Invoke();
+    public abstract bool Evaluate(); // Renamed from Invoke to Evaluate
 }
 
 // Selector Node
@@ -18,11 +18,11 @@ public class Selector : BTNode
         this.nodes = nodes;
     }
 
-    public override bool Invoke()
+    public override bool Evaluate() // Renamed from Invoke to Evaluate
     {
         foreach (var node in nodes)
         {
-            if (node.Invoke())
+            if (node.Evaluate()) // Renamed from Invoke to Evaluate
             {
                 return true;
             }
@@ -41,11 +41,11 @@ public class Sequence : BTNode
         this.nodes = nodes;
     }
 
-    public override bool Invoke()
+    public override bool Evaluate() // Renamed from Invoke to Evaluate
     {
         foreach (var node in nodes)
         {
-            if (!node.Invoke())
+            if (!node.Evaluate()) // Renamed from Invoke to Evaluate
             {
                 return false;
             }
@@ -65,7 +65,7 @@ public class ActionNode : BTNode
         this.action = action;
     }
 
-    public override bool Invoke()
+    public override bool Evaluate() // Renamed from Invoke to Evaluate
     {
         return action();
     }
@@ -82,7 +82,7 @@ public class ConditionNode : BTNode
         this.condition = condition;
     }
 
-    public override bool Invoke()
+    public override bool Evaluate() // Renamed from Invoke to Evaluate
     {
         return condition();
     }
