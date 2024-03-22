@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class RoundController : MonoBehaviour
 {
@@ -28,8 +29,8 @@ public class RoundController : MonoBehaviour
 
     private void ResetRoundPositions()
     {
-        player.transform.position = playerStartTransform.position;
-        ai.transform.position = aiStartTransform.position;
+        player.GetComponent<NavMeshAgent>().Warp(playerStartTransform.position);
+        ai.GetComponent<NavMeshAgent>().Warp(aiStartTransform.position);
         BlueFlag.transform.SetParent(null);
         RedFlag.transform.SetParent(null);
         ToggleFlagPhysics(RedFlag, false);
