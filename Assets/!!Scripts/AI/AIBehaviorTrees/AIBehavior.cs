@@ -35,17 +35,16 @@ public class AIBehavior : MonoBehaviour
 
     void InitializeBehaviorTree()
     {
-        // Dynamically build the behavior tree based on current game state
         behaviorTree = new Selector(new List<BTNode>
         {
             new Sequence(new List<BTNode>
             {
-                new ConditionNode(HasFlag),
+                new DecoratorNode(HasFlag),
                 new ActionNode(ReturnFlag)
             }),
             new Sequence(new List<BTNode>
             {
-                new ConditionNode(() => !HasFlag()),
+                new DecoratorNode(() => !HasFlag()),
                 new ActionNode(TryCaptureOwnFlag)
             }),
         });
@@ -60,7 +59,6 @@ public class AIBehavior : MonoBehaviour
     {
         if (IsCloseTo(aiBaseTransform.position, captureDistance) && HasFlag())
         {
-            Debug.Log("Flag returned to base!");
             GameEventSystem.FlagCaptured(gameObject, "captured the flag");
             ResetFlag();
             return true;
@@ -74,7 +72,6 @@ public class AIBehavior : MonoBehaviour
         if (IsCloseTo(ownFlagTransform.position, captureDistance))
         {
             FlagInteraction(ownFlagTransform.gameObject);
-            Debug.Log("Flag captured!");
             return HasFlag();
         }
         MoveToTarget(ownFlagTransform.position);
@@ -102,7 +99,7 @@ public class AIBehavior : MonoBehaviour
     {
         foreach (Transform child in aiFlagSlot)
         {
-            child.SetParent(null); // Consider resetting position/rotation here if necessary
+            child.SetParent(null); 
         }
     }
 }

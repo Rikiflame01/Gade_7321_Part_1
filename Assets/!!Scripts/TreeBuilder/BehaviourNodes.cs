@@ -5,7 +5,7 @@ using UnityEngine;
 // Base Node
 public abstract class BTNode
 {
-    public abstract bool Evaluate(); // Renamed from Invoke to Evaluate
+    public abstract bool Evaluate();
 }
 
 // Selector Node
@@ -18,11 +18,11 @@ public class Selector : BTNode
         this.nodes = nodes;
     }
 
-    public override bool Evaluate() // Renamed from Invoke to Evaluate
+    public override bool Evaluate() 
     {
         foreach (var node in nodes)
         {
-            if (node.Evaluate()) // Renamed from Invoke to Evaluate
+            if (node.Evaluate()) 
             {
                 return true;
             }
@@ -41,11 +41,11 @@ public class Sequence : BTNode
         this.nodes = nodes;
     }
 
-    public override bool Evaluate() // Renamed from Invoke to Evaluate
+    public override bool Evaluate()
     {
         foreach (var node in nodes)
         {
-            if (!node.Evaluate()) // Renamed from Invoke to Evaluate
+            if (!node.Evaluate())
             {
                 return false;
             }
@@ -65,24 +65,24 @@ public class ActionNode : BTNode
         this.action = action;
     }
 
-    public override bool Evaluate() // Renamed from Invoke to Evaluate
+    public override bool Evaluate()
     {
         return action();
     }
 }
 
 // Condition Node
-public class ConditionNode : BTNode
+public class DecoratorNode : BTNode
 {
     public delegate bool ConditionNodeDelegate();
     private readonly ConditionNodeDelegate condition;
 
-    public ConditionNode(ConditionNodeDelegate condition)
+    public DecoratorNode(ConditionNodeDelegate condition)
     {
         this.condition = condition;
     }
 
-    public override bool Evaluate() // Renamed from Invoke to Evaluate
+    public override bool Evaluate()
     {
         return condition();
     }

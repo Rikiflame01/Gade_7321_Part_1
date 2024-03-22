@@ -27,8 +27,6 @@ public class ScoreManager : MonoBehaviour
             aiScore++;
         }
 
-        Debug.Log($"Score Updated. Player: {playerScore}, AI: {aiScore}");
-
         // Directly trigger the static events to update the score and reset the round
         GameEventSystem.ScoreUpdated(playerScore, aiScore);
         GameEventSystem.RoundReset();

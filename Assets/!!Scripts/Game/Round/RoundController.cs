@@ -41,14 +41,12 @@ public class RoundController : MonoBehaviour
 
         ToggleFlagPhysics(RedFlag, true);
         ToggleFlagPhysics(BlueFlag, true);
-        Debug.Log("Round positions reset.");
     }
 
     private void UpdateScoreDisplay(int playerScore, int aiScore)
     {
         // Directly trigger the static event to update UI elements with new scores
         GameEventSystem.ScoreCanvasUpdated(playerScore, aiScore);
-        Debug.Log($"Score display updated. Player: {playerScore}, AI: {aiScore}");
     }
     private void ToggleFlagPhysics(GameObject flag, bool enablePhysics)
     {

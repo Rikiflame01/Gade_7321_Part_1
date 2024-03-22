@@ -20,6 +20,5 @@ public class ScoreCanvas : MonoBehaviour
     {
         playerScoreText.text = "Player Score: " + playerScore.ToString();
         aiScoreText.text = "AI Score: " + aiScore.ToString();
-        Debug.Log($"Updating score UI. Player: {playerScore}, AI: {aiScore}");
     }
 }

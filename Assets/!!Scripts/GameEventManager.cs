@@ -16,7 +16,6 @@ public static class GameEventSystem
 
     public static void FlagCaptured(GameObject scorer, string scoreType)
     {
-        Debug.Log($"Flag captured by {scorer.name}! Type: {scoreType}");
         OnFlagCaptured?.Invoke(scorer, scoreType);
     }
 
