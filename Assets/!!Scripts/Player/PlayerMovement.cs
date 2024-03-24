@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    public float turnSpeed = 200f; // Speed of turning, can adjust as needed
     private PlayerControls controls;
     private Vector2 moveInput;
 
@@ -15,7 +16,6 @@ public class PlayerMovement : MonoBehaviour
         // Bind the movement action
         controls.Player.WASD.performed += ctx =>
         {
-            // Ensure moveInput and other operations are valid here.
             moveInput = ctx.ReadValue<Vector2>();
         };
         controls.Player.WASD.canceled += ctx => moveInput = Vector2.zero;
@@ -33,7 +33,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        Vector3 move = new Vector3(moveInput.x, 0, moveInput.y) * moveSpeed * Time.deltaTime;
-        transform.Translate(move);
+        // Forward and backward movement
+        Vector3 move = transform.forward * moveInput.y * moveSpeed * Time.deltaTime;
+        transform.Translate(move, Space.World);
+
+        // Turning left and right
+        float turn = moveInput.x * turnSpeed * Time.deltaTime;
+        transform.Rotate(0, turn, 0);
     }
 }

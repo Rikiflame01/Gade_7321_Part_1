@@ -8,6 +8,8 @@ TagManager:
   - RedFlag
   - AI
   - PlayerSpawnPoint
+  - PlayerProjectile
+  - AiProjectile
   layers:
   - Default
   - TransparentFX

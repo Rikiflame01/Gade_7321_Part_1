@@ -94,6 +94,34 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""Shoot"",
+            ""id"": ""bc892e30-23c6-43f6-a89e-1e7d209b41c6"",
+            ""actions"": [
+                {
+                    ""name"": ""Shoot"",
+                    ""type"": ""Button"",
+                    ""id"": ""d20f797d-24d3-41a0-9fe2-7316da17cf9c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""267ad87e-2195-414e-ba79-8813b76a8151"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -101,6 +129,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_WASD = m_Player.FindAction("WASD", throwIfNotFound: true);
+        // Shoot
+        m_Shoot = asset.FindActionMap("Shoot", throwIfNotFound: true);
+        m_Shoot_Shoot = m_Shoot.FindAction("Shoot", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -204,8 +235,58 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Shoot
+    private readonly InputActionMap m_Shoot;
+    private List<IShootActions> m_ShootActionsCallbackInterfaces = new List<IShootActions>();
+    private readonly InputAction m_Shoot_Shoot;
+    public struct ShootActions
+    {
+        private @PlayerControls m_Wrapper;
+        public ShootActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Shoot => m_Wrapper.m_Shoot_Shoot;
+        public InputActionMap Get() { return m_Wrapper.m_Shoot; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(ShootActions set) { return set.Get(); }
+        public void AddCallbacks(IShootActions instance)
+        {
+            if (instance == null || m_Wrapper.m_ShootActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_ShootActionsCallbackInterfaces.Add(instance);
+            @Shoot.started += instance.OnShoot;
+            @Shoot.performed += instance.OnShoot;
+            @Shoot.canceled += instance.OnShoot;
+        }
+
+        private void UnregisterCallbacks(IShootActions instance)
+        {
+            @Shoot.started -= instance.OnShoot;
+            @Shoot.performed -= instance.OnShoot;
+            @Shoot.canceled -= instance.OnShoot;
+        }
+
+        public void RemoveCallbacks(IShootActions instance)
+        {
+            if (m_Wrapper.m_ShootActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IShootActions instance)
+        {
+            foreach (var item in m_Wrapper.m_ShootActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_ShootActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public ShootActions @Shoot => new ShootActions(this);
     public interface IPlayerActions
     {
         void OnWASD(InputAction.CallbackContext context);
+    }
+    public interface IShootActions
+    {
+        void OnShoot(InputAction.CallbackContext context);
     }
 }

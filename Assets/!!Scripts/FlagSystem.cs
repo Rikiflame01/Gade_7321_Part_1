@@ -3,8 +3,17 @@ using UnityEngine;
 public class FlagSystem : MonoBehaviour
 {
     [SerializeField]
-    private Transform blueFlagSpawnPoint; // Assign in the Inspector
+    private Transform blueFlagSpawnTransform;
+
     public Transform flagslot;
+    private void OnEnable()
+    {
+        GameEventSystem.OnFlagReset += ResetFlag;
+    }
+    private void OnDisable()
+    {
+        GameEventSystem.OnFlagReset -= ResetFlag;
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -18,6 +27,12 @@ public class FlagSystem : MonoBehaviour
             GameEventSystem.FlagCaptured(gameObject, "collected blue flag");
             GameEventSystem.RoundReset();
         }
+        if (collision.gameObject.CompareTag("RedFlag"))
+        {
+            Debug.Log("Red Flag Touched");
+            //collision.gameObject.transform.position = redFlagSpawnPoint.transform.position;
+            GameEventSystem.ResetFlag(collision.gameObject);
+        }
     }
 
     private void CollectBlueFlag(GameObject blueFlag)
@@ -26,6 +41,15 @@ public class FlagSystem : MonoBehaviour
         blueFlag.transform.localPosition = Vector3.zero;
         blueFlag.transform.localRotation = Quaternion.identity;
 
+    }
+
+    private void ResetFlag(GameObject flag)
+    {
+        if (flag.tag == "BlueFlag")
+        {
+            flag.transform.SetParent(null);
+            flag.transform.position = blueFlagSpawnTransform.position;
+        }
     }
 
 }

@@ -11,6 +11,9 @@ public static class GameEventSystem
     public delegate void RoundResetHandler();
     public static event RoundResetHandler OnRoundReset;
 
+    public delegate void FlagResetHandler(GameObject flag);
+    public static event FlagResetHandler OnFlagReset;
+
     public delegate void ScoreUpdateHandler(int playerScore, int aiScore);
     public static event ScoreUpdateHandler OnScoreUpdated;
 
@@ -32,5 +35,10 @@ public static class GameEventSystem
     public static void ScoreCanvasUpdated(int playerScore, int aiScore)
     {
         OnScoreCanvasUpdated?.Invoke(playerScore, aiScore);
+    }
+
+    public static void ResetFlag(GameObject flag) 
+    { 
+        OnFlagReset?.Invoke(flag);
     }
 }

@@ -87,3 +87,25 @@ public class DecoratorNode : BTNode
         return condition();
     }
 }
+public class RepeatUntilFail : BTNode
+{
+    private BTNode node;
+
+    public RepeatUntilFail(BTNode node)
+    {
+        this.node = node;
+    }
+
+    public override bool Evaluate()
+    {
+        while (true)
+        {
+            bool success = node.Evaluate();
+            if (!success)
+            {
+                // Stops repeating when the child node fails
+                return false;
+            }
+        }
+    }
+}
