@@ -5,127 +5,135 @@ using UnityEngine.AI;
 
 public class AIBehavior : MonoBehaviour
 {
+
     [Header("Configuration Parameters")]
     public Transform playerTransform;
     public Transform ownFlagTransform;
     public Transform redFlagSpawnTransform;
     public Transform aiBaseTransform;
     public Transform aiFlagSlot;
-    public Transform eyeTransform; 
+
+    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private Transform shootingPoint;
 
     [SerializeField] private float checkRate = 2.0f;
     [SerializeField] private float captureDistance = 1.0f;
-    [SerializeField] private float engageDistance = 10f; 
-
-    [Header("Shooting Parameters")]
-    [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private Transform shootingPoint;
+    [SerializeField] private float engageDistance = 10f;
     [SerializeField] private float shootingDistance = 10f;
     [SerializeField] private float shootingCooldown = 2f;
-
-    [Header("Strategy Parameters")]
     [SerializeField] private float evadeCooldown = 10f;
 
     private NavMeshAgent agent;
     private BTNode behaviorTree;
-    private float nextCheckTime = 0f;
-    private float nextShotTime = 0f;
-    private float nextEvadeTime = 0f;
-    private bool isHostile = false;
+
+    private float nextCheckTime;
+    private float nextShotTime;
+    private float nextEvadeTime;
+    private bool isHostile;
+    private bool shouldMaintainDistance = false;
+    private bool shouldFacePlayer = false;
 
     private GameObject detectedProjectile;
 
-    public Transform warpPointOne;
-    public Transform warpPointTwo;
+    public Transform[] warpPoints;
 
-    void Start()
+
+
+    private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         InitializeBehaviorTree();
     }
 
-    void Update()
+    private void Update()
     {
         if (Time.time >= nextCheckTime)
         {
             behaviorTree.Evaluate();
+            UpdateBehaviorFlags();
             nextCheckTime = Time.time + checkRate;
+        }
+
+        if (shouldFacePlayer)
+        {
             FacePlayer();
         }
-    }
 
-    private void OnEnable()
-    {
-        GameEventSystem.OnFlagReset += ResetFlag;
-    }
-    private void OnDisable()
-    {
-        GameEventSystem.OnFlagReset -= ResetFlag;
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("PlayerProjectile"))
+        if (shouldMaintainDistance)
         {
-            Debug.Log("AI detected player projectile.");
-
-            detectedProjectile = other.gameObject; // Assign the detected projectile
-                                                   // Trigger evade behavior if within evade cooldown
-            if (CanEvade())
-            {
-                TryWarpToSafety();
-            }
+            MaintainDistanceFromPlayer();
         }
     }
 
-    void InitializeBehaviorTree()
+
+    private void OnTriggerEnter(Collider other)
     {
-        behaviorTree = new Selector(new List<BTNode>
-    {
-        // Handle behavior when AI has the flag
-        new Sequence(new List<BTNode>
+        if (other.CompareTag("PlayerProjectile"))
         {
-            new DecoratorNode(HasFlag),
-            new Selector(new List<BTNode>
-            {
-                // Check if path is blocked
-                new Sequence(new List<BTNode>
-                {
-                    new DecoratorNode(() => IsPathBlocked(aiBaseTransform.position)),
-                    new ActionNode(EngagePlayerOrReevaluate)
-                }),
-                // Attempt to return the flag if the path is clear
-                new Sequence(new List<BTNode>
-                {
-                    new DecoratorNode(() => !IsPathBlocked(aiBaseTransform.position)),
-                    new ActionNode(ReturnFlag)
-                })
-            })
-        }),
-        
-        // Handle behavior when AI does not have the flag
-        new Sequence(new List<BTNode>
-        {
-            new DecoratorNode(() => !HasFlag()),
-            new Selector(new List<BTNode>
-            {
-                // Attempt to capture the flag if the path is clear
-                new Sequence(new List<BTNode>
-                {
-                    new DecoratorNode(() => !IsPathBlocked(ownFlagTransform.position)),
-                    new ActionNode(TryCaptureOwnFlag)
-                }),
-                // Engage the player if the path is blocked or the player is within engagement distance
-                new Sequence(new List<BTNode>
-                {
-                    new DecoratorNode(() => IsPathBlocked(ownFlagTransform.position) || IsPlayerWithinEngagementDistance()),
-                    new ActionNode(BecomeHostile)
-                })
-            })
-        })
-    });
+            detectedProjectile = other.gameObject;
+            if (CanEvade()) TryWarpToSafety();
+        }
     }
 
+    private void InitializeBehaviorTree()
+    {
+        behaviorTree = new Selector(new List<BTNode>
+        {
+            //If the AI has the flag.
+            new Sequence(new List<BTNode>
+            {
+                new DecoratorNode(HasFlag),
+                new Selector(new List<BTNode>
+                {
+                    new Sequence(new List<BTNode>
+                    {
+                        new DecoratorNode(() => IsPathBlocked(aiBaseTransform.position)),
+                        //new ActionNode(EngagePlayerOrReevaluate)
+                        new ActionNode(BecomeHostile)
+                    }),
+                    new Sequence(new List<BTNode>
+                    {
+                        new DecoratorNode(() => !IsPathBlocked(aiBaseTransform.position)),
+                        new ActionNode(ReturnFlag)
+                    })
+                })
+            }),
+            //If the AI does not have the flag.
+            new Sequence(new List<BTNode>
+            {
+                new DecoratorNode(() => !HasFlag()),
+                new Selector(new List<BTNode>
+                {
+                    new Sequence(new List<BTNode>
+                    {
+                        new DecoratorNode(() => IsPathBlocked(ownFlagTransform.position) || IsPlayerWithinEngagementDistance()),
+                        new ActionNode(BecomeHostile)
+                    }),
+                    new Sequence(new List<BTNode>
+                    {
+                        new DecoratorNode(() => !IsPathBlocked(ownFlagTransform.position)),
+                        new ActionNode(TryCaptureOwnFlag)
+                    })
+                })
+            })
+        });
+    }
+
+    private void UpdateBehaviorFlags()
+    {
+        // Example condition to update flags
+        if (isHostile)
+        {
+            shouldFacePlayer = true;
+            shouldMaintainDistance = true;
+        }
+        else
+        {
+            shouldFacePlayer = false;
+            shouldMaintainDistance = false;
+        }
+
+    }
 
     private bool HasFlag() => aiFlagSlot.childCount > 0;
 
@@ -148,6 +156,7 @@ public class AIBehavior : MonoBehaviour
 
     private bool TryCaptureOwnFlag()
     {
+        isHostile = false;
         // Directly move towards the flag's position
         MoveToTarget(ownFlagTransform.position);
 
@@ -191,6 +200,7 @@ public class AIBehavior : MonoBehaviour
     {
         if (CanShootPlayer())
         {
+            FacePlayer();
             nextShotTime = Time.time + shootingCooldown;
             GameObject projectile = Instantiate(projectilePrefab, shootingPoint.position, Quaternion.LookRotation(playerTransform.position - shootingPoint.position));
             projectile.GetComponent<Rigidbody>().velocity = (playerTransform.position - shootingPoint.position).normalized * 20f;
@@ -214,8 +224,6 @@ public class AIBehavior : MonoBehaviour
     private bool BecomeHostile()
     {
         isHostile = true;
-
-        // Continuously check to shoot at player when hostile and within shooting range
         if (Time.time >= nextShotTime && Vector3.Distance(transform.position, playerTransform.position) <= shootingDistance)
         {
             StopAndShoot();
@@ -225,89 +233,39 @@ public class AIBehavior : MonoBehaviour
             MoveSideToSide();
         }
         MaintainDistanceFromPlayer();
-        return true; // Becoming hostile always succeeds
+        return true; 
     }
-
-    private bool EngagePlayerOrReevaluate()
-    {
-        isHostile = true;
-        if (CanEvade() && detectedProjectile != null)
-        {
-            TryWarpToSafety();
-        }
-        else if (Time.time >= nextShotTime)
-        {
-            StopAndShoot();
-        }
-        else
-        {
-            MoveSideToSide();
-        }
-        MaintainDistanceFromPlayer();
-
-        // Re-evaluate if the AI still has the flag
-        if (!HasFlag())
-        {
-            // Flag has been taken, possibly reset or change behavior
-            isHostile = false; // Consider changing state or behavior
-            return false; // Indicate that action has finished due to flag loss
-        }
-
-        // Re-check if the path has become clear to return the flag
-        if (!IsPathBlocked(aiBaseTransform.position))
-        {
-            isHostile = false; // Reset hostile state
-            return ReturnFlag(); // Attempt to return the flag again
-        }
-
-        return true; // Continue engagement
-    }
-
     private bool CanEvade() => Time.time >= nextEvadeTime;
 
-    void TryWarpToSafety()
+    private void TryWarpToSafety()
     {
-        float checkRadius = 0.01f;
-
-        if (!Physics.CheckSphere(warpPointOne.position, checkRadius))
+        foreach (var warpPoint in warpPoints)
         {
-            WarpTo(warpPointOne.position);
-            // Apply cooldown after successful warp
-            nextEvadeTime = Time.time + evadeCooldown;
-        }
-        else if (!Physics.CheckSphere(warpPointTwo.position, checkRadius))
-        {
-            WarpTo(warpPointTwo.position);
-            // Apply cooldown after successful warp
-            nextEvadeTime = Time.time + evadeCooldown;
-        }
-        else
-        {
-            Debug.Log("No safe warp points available.");
+            if (!Physics.CheckSphere(warpPoint.position, 0.01f))
+            {
+                WarpTo(warpPoint.position);
+                nextEvadeTime = Time.time + evadeCooldown;
+                return;
+            }
         }
     }
 
     void WarpTo(Vector3 targetPosition)
     {
-        agent.Warp(targetPosition); // For NavMeshAgent
-                                    // Or simply set the position for non-NavMesh agents:
-                                    // transform.position = targetPosition;
+        agent.Warp(targetPosition); 
     }
 
     private void StopAndShoot()
     {
         if (CanShootPlayer())
         {
-            // Explicitly stop the agent
             agent.isStopped = true;
 
-            // Shoot at the player
             if (ShootAtPlayer())
             {
                 Debug.Log("Shooting at player.");
             }
 
-            // Resume movement after a delay to simulate shooting action duration
             StartCoroutine(ResumeMovementAfterDelay(0.2f));
         }
     }
@@ -320,7 +278,7 @@ public class AIBehavior : MonoBehaviour
 
     private void MoveSideToSide()
     {
-        if (!isHostile) return; // Only move side to side if in hostile mode
+        if (!isHostile) return; 
         StartCoroutine(SideToSideMovement());
     }
 
@@ -329,7 +287,7 @@ public class AIBehavior : MonoBehaviour
         while (Time.time < nextShotTime)
         {
             Vector3 sideStepDirection = Random.value < 0.5f ? transform.right : -transform.right;
-            Vector3 targetPosition = transform.position + sideStepDirection * 2f; 
+            Vector3 targetPosition = transform.position + sideStepDirection * 2f;
             agent.SetDestination(targetPosition);
             yield return new WaitForSeconds(Random.Range(1f, 3f));
         }
@@ -340,32 +298,32 @@ public class AIBehavior : MonoBehaviour
         Vector3 directionToPlayer = playerTransform.position - transform.position;
         directionToPlayer.y = 0; // Keep rotation in the horizontal plane
         Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 20f);
     }
 
     private void MaintainDistanceFromPlayer()
     {
+        // First, confirm that the AI should be trying to maintain distance
+        // For instance, only maintain distance if in a hostile state or actively engaging the player
+        if (!isHostile) return;
+
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-        if (distanceToPlayer > engageDistance)
+        float stopDistance = engageDistance * 0.8f; // Stop moving closer if within 80% of engage distance
+        float backOffDistance = engageDistance * 1.2f; // Start moving away if closer than 120% of engage distance
+
+        if (distanceToPlayer > backOffDistance)
         {
-            Vector3 closerPosition = Vector3.MoveTowards(transform.position, playerTransform.position, 2f);
-            agent.SetDestination(closerPosition);
+            // If too far, move closer
+            MoveToTarget(playerTransform.position);
         }
-        else if (distanceToPlayer < engageDistance)
+        else if (distanceToPlayer < stopDistance)
         {
-            Vector3 backAwayPosition = Vector3.MoveTowards(transform.position, playerTransform.position, -2f);
-            agent.SetDestination(backAwayPosition);
+            // If too close, back away
+            Vector3 directionAwayFromPlayer = (transform.position - playerTransform.position).normalized;
+            Vector3 backAwayPosition = transform.position + directionAwayFromPlayer * 2f;
+            MoveToTarget(backAwayPosition);
         }
+        // If within the optimal range, consider not moving to avoid jittery behavior
     }
 
-    private void ResetFlag(GameObject flag)
-    {
-        if (flag.tag == "RedFlag")
-        {
-            flag.transform.SetParent(null);
-            flag.transform.position = redFlagSpawnTransform.position;
-        }
-
-    }
 }
-

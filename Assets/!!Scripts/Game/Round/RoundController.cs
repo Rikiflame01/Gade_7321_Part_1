@@ -41,6 +41,7 @@ public class RoundController : MonoBehaviour
         GameEventSystem.OnScoreUpdated += UpdateScoreDisplay;
         GameEventSystem.OnAIWin += AIWins;
         GameEventSystem.OnPlayerWin += PlayerWins;
+        GameEventSystem.OnFlagReset += ResetFlag;
     }
 
     void OnDisable()
@@ -50,6 +51,7 @@ public class RoundController : MonoBehaviour
         GameEventSystem.OnScoreUpdated -= UpdateScoreDisplay;
         GameEventSystem.OnAIWin -= AIWins;
         GameEventSystem.OnPlayerWin -= PlayerWins;
+        GameEventSystem.OnFlagReset -= ResetFlag;
     }
 
     private void ResetRoundPositions()
@@ -130,6 +132,20 @@ public class RoundController : MonoBehaviour
         }
 
            
+    }
+
+    private void ResetFlag(GameObject flag)
+    {
+        if (flag.tag == "RedFlag")
+        {
+            flag.transform.SetParent(null);
+            flag.transform.position = RedFlagSpawn.position;
+        }
+        if (flag.tag == "BlueFlag")
+        {
+            flag.transform.SetParent(null);
+            flag.transform.position = BlueFlagSpawn.position;
+        }
     }
 
     private void AIWins() 
