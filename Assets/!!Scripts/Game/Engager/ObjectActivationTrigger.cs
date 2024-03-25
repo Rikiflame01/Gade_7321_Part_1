@@ -1,8 +1,14 @@
 using System.Collections;
 using UnityEngine;
 
+/* This class is used to activate objects when both the player and AI enter the trigger.
+ * * It is used to activate objects after a delay and deactivate them after a duration.
+ * * */
+//This class's purpose is to force the player and AI to enage in 1v1 battles.
+
 public class ObjectActivationTrigger : MonoBehaviour
 {
+    #region Dependencies
     public GameObject[] objectsToActivate;
     public float activationDelay = 1.5f;
     public float activeDuration = 15f;
@@ -10,10 +16,11 @@ public class ObjectActivationTrigger : MonoBehaviour
     private bool playerInside = false;
     private bool aiInside = false;
     private Coroutine activationCoroutine;
+    #endregion
 
+    #region Unity Methods
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the player or AI enters the trigger
         if (other.CompareTag("Player"))
         {
             playerInside = true;
@@ -28,7 +35,6 @@ public class ObjectActivationTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        // Check if the player or AI exits the trigger
         if (other.CompareTag("Player"))
         {
             playerInside = false;
@@ -38,7 +44,6 @@ public class ObjectActivationTrigger : MonoBehaviour
             aiInside = false;
         }
 
-        // If either leaves, consider deactivating the objects immediately or after a delay
         if (!playerInside || !aiInside)
         {
             if (activationCoroutine != null)
@@ -46,13 +51,14 @@ public class ObjectActivationTrigger : MonoBehaviour
                 StopCoroutine(activationCoroutine);
                 activationCoroutine = null;
             }
-            DeactivateObjects(); // Call DeactivateObjects to ensure objects are turned off if one leaves early
+            DeactivateObjects(); 
         }
     }
+    #endregion
 
+    #region Private Methods
     private void CheckAndStartActivation()
     {
-        // If both the player and AI are inside, start the activation process
         if (playerInside && aiInside && activationCoroutine == null)
         {
             activationCoroutine = StartCoroutine(ActivateObjectsAfterDelay());
@@ -61,10 +67,8 @@ public class ObjectActivationTrigger : MonoBehaviour
 
     private IEnumerator ActivateObjectsAfterDelay()
     {
-        // Wait for the specified delay
         yield return new WaitForSeconds(activationDelay);
 
-        // Activate the objects
         foreach (GameObject obj in objectsToActivate)
         {
             if (obj != null)
@@ -73,13 +77,10 @@ public class ObjectActivationTrigger : MonoBehaviour
             }
         }
 
-        // Wait for the duration the objects should remain active
         yield return new WaitForSeconds(activeDuration);
 
-        // Deactivate the objects
         DeactivateObjects();
 
-        // Reset the coroutine tracker
         activationCoroutine = null;
     }
 
@@ -93,4 +94,5 @@ public class ObjectActivationTrigger : MonoBehaviour
             }
         }
     }
+    #endregion
 }

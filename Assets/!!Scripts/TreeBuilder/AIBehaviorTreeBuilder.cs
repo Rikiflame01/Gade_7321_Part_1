@@ -1,5 +1,10 @@
 using System.Collections.Generic;
 
+/* 
+ * * * This class is used to build the behavior tree for the AI.
+ * * * It is used to create the selector and sequence nodes for the behavior tree.
+ * * */
+
 public class AIBehaviorTreeBuilder
 {
     private BTNode root;

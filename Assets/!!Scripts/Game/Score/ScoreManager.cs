@@ -1,6 +1,8 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
+// This class is used to manage the score in the game.
+
 public class ScoreManager : MonoBehaviour
 {
     private int playerScore = 0;
@@ -19,7 +21,6 @@ public class ScoreManager : MonoBehaviour
 
     private void HandleFlagCapture(GameObject scorer, string scoreType)
     {
-        // Increment score based on who captured the flag
         if (scorer.CompareTag("Player"))
         {
             if (playerScore < 5)
@@ -44,9 +45,7 @@ public class ScoreManager : MonoBehaviour
             }
 
             
-        }
-
-        // Directly trigger the static events to update the score and reset the round
+        };
         GameEventSystem.ScoreUpdated(playerScore, aiScore);
         GameEventSystem.RoundReset();
     }

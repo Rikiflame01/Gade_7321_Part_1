@@ -1,7 +1,15 @@
 using UnityEngine;
 
+/* 
+ * * This class is used to manage the events that occur in the game. 
+ * * It is used to communicate between different classes and objects in the game.
+ * * It is used to update the score, reset the round, update the score canvas, 
+ * * reset the flag, reset the character, and declare the or loser winner of the game.
+ * */
+
 public static class GameEventSystem
 {
+    #region Delegates and Events
     public delegate void ScoreCanvasUpdateHandler(int playerScore, int aiScore);
     public static event ScoreCanvasUpdateHandler OnScoreCanvasUpdated;
 
@@ -25,7 +33,9 @@ public static class GameEventSystem
 
     public delegate void ScoreUpdateHandler(int playerScore, int aiScore);
     public static event ScoreUpdateHandler OnScoreUpdated;
+    #endregion
 
+    #region Event Invokers
     public static void FlagCaptured(GameObject scorer, string scoreType)
     {
         OnFlagCaptured?.Invoke(scorer, scoreType);
@@ -65,4 +75,5 @@ public static class GameEventSystem
     {
         OnAIWin?.Invoke();
     }
+    #endregion
 }

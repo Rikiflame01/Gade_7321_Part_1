@@ -4,8 +4,15 @@ using TMPro;
 using System.Collections;
 using Unity.VisualScripting;
 
+/* 
+ * * * This class is used to manage the round in the game.
+ * * * It is used to manage the countdown to start the round, 
+ * * * reset the character positions, update the score, reset the flag, and handle the win conditions.
+ * * */
 public class RoundController : MonoBehaviour
 {
+
+    #region Dependencies
     public GameObject WinCanvas;
     public GameObject LoseCanvas;
 
@@ -26,7 +33,9 @@ public class RoundController : MonoBehaviour
 
     public GameObject player;
     public GameObject ai;
+    #endregion
 
+    #region Unity Methods
     private void Awake()
     {
         player.GetComponent<PlayerMovement>().enabled = false;
@@ -53,7 +62,9 @@ public class RoundController : MonoBehaviour
         GameEventSystem.OnPlayerWin -= PlayerWins;
         GameEventSystem.OnFlagReset -= ResetFlag;
     }
+    #endregion
 
+    #region Private Methods
     private void ResetRoundPositions()
     {
         player.GetComponent<NavMeshAgent>().Warp(playerStartTransform.position);
@@ -75,7 +86,6 @@ public class RoundController : MonoBehaviour
         currentRound++;
         currentRoundDisplay.text = currentRound.ToString();
 
-        // Directly trigger the static event to update UI elements with new scores
         GameEventSystem.ScoreCanvasUpdated(playerScore, aiScore);
     }
     private void ToggleFlagPhysics(GameObject flag, bool enablePhysics)
@@ -163,5 +173,6 @@ public class RoundController : MonoBehaviour
         WinCanvas.SetActive(true);
         
     }
+    #endregion
 }
 

@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// This class is used to manage the player's shooting ability.
+
 public class PlayerShoot : MonoBehaviour
 {
+    #region Dependencies
     public GameObject projectilePrefab;
     public Transform shootingPoint;
     public Camera playerCamera;
@@ -10,8 +13,10 @@ public class PlayerShoot : MonoBehaviour
     private PlayerControls playerInput;
     private InputAction shootAction;
     private float shootCooldown = 5.0f; 
-    private float nextShootTime = 0f; 
+    private float nextShootTime = 0f;
+    #endregion
 
+    #region Unity Methods
     private void Awake()
     {
         playerInput = new PlayerControls();
@@ -30,6 +35,9 @@ public class PlayerShoot : MonoBehaviour
         shootAction.performed -= OnShoot;
     }
 
+    #endregion
+
+    #region Private Methods
     private void OnShoot(InputAction.CallbackContext context)
     {
         if (Time.time >= nextShootTime)
@@ -53,4 +61,5 @@ public class PlayerShoot : MonoBehaviour
             }
         }
     }
+    #endregion
 }

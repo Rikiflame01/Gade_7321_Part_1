@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/* this class is used to manage the behaviour nodes in the game. 
+ * * * It is used to create the nodes for the behaviour tree, 
+ * * * evaluate the nodes, and create the different types of nodes.
+ * * * */
+
 // Base Node
 public abstract class BTNode
 {
@@ -71,7 +76,7 @@ public class ActionNode : BTNode
     }
 }
 
-// Condition Node
+// Decorator Node
 public class DecoratorNode : BTNode
 {
     public delegate bool ConditionNodeDelegate();
@@ -87,6 +92,8 @@ public class DecoratorNode : BTNode
         return condition();
     }
 }
+
+// Repeat Until Fail Node
 public class RepeatUntilFail : BTNode
 {
     private BTNode node;

@@ -1,13 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// This class is used to manage the player's movement ability.
+
 public class PlayerMovement : MonoBehaviour
 {
+    #region Dependencies
     public float moveSpeed = 5f;
-    public float turnSpeed = 200f; // Speed of turning, can adjust as needed
+    public float turnSpeed = 200f; 
     private PlayerControls controls;
     private Vector2 moveInput;
+    #endregion
 
+    #region Unity Methods
     private void Awake()
     {
         // Initialize the controls
@@ -41,4 +46,5 @@ public class PlayerMovement : MonoBehaviour
         float turn = moveInput.x * turnSpeed * Time.deltaTime;
         transform.Rotate(0, turn, 0);
     }
+    #endregion
 }

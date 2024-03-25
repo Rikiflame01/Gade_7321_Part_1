@@ -1,6 +1,8 @@
 using TMPro;
 using UnityEngine;
 
+// This class is used to manage the score canvas in the game.
+
 public class ScoreCanvas : MonoBehaviour
 {
     public TextMeshProUGUI playerScoreText;

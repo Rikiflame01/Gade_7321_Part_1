@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI; 
 
+// This class is used to manage the UI interactions in the game.
+
 public class UIManager : MonoBehaviour
 {
     public GameObject howToPlayCanvas;
