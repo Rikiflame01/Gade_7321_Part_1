@@ -9583,7 +9583,7 @@ MonoBehaviour:
   shootingPoint: {fileID: 1027070888}
   checkRate: 2
   captureDistance: 2
-  engageDistance: 3
+  engageDistance: 2
   shootingDistance: 5
   shootingCooldown: 5
   evadeCooldown: 10

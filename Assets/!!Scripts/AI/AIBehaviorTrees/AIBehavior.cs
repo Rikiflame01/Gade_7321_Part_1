@@ -52,6 +52,7 @@ public class AIBehavior : MonoBehaviour
         {
             behaviorTree.Evaluate();
             UpdateBehaviorFlags();
+            ReevaluateObjectives();
             nextCheckTime = Time.time + checkRate;
         }
 
@@ -65,6 +66,16 @@ public class AIBehavior : MonoBehaviour
             MaintainDistanceFromPlayer();
         }
     }
+
+    private void ReevaluateObjectives()
+    {
+        if (HasFlag() && !IsPathBlocked(aiBaseTransform.position))
+        {
+
+            isHostile = false;
+        }
+    }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -122,11 +133,6 @@ public class AIBehavior : MonoBehaviour
         });
     }
 
-    //End of Behavior Tree
-    #region Behavior Tree Methods
-
-    // Behavior and Status Updates
-
     private void UpdateBehaviorFlags()
     {
         if (isHostile)
@@ -139,70 +145,10 @@ public class AIBehavior : MonoBehaviour
             shouldFacePlayer = false;
             shouldMaintainDistance = false;
         }
+
     }
 
     private bool HasFlag() => aiFlagSlot.childCount > 0;
-
-    private bool BecomeHostile()
-    {
-        isHostile = true;
-        if (Time.time >= nextShotTime && Vector3.Distance(transform.position, playerTransform.position) <= shootingDistance)
-        {
-            StopAndShoot();
-        }
-        else
-        {
-            MoveSideToSide();
-        }
-        MaintainDistanceFromPlayer();
-        return true;
-    }
-
-    // Movement and Positioning
-
-    private void MoveToTarget(Vector3 target) => agent.SetDestination(target);
-
-    private bool IsCloseTo(Vector3 position, float distance) => Vector3.Distance(transform.position, position) < distance;
-
-    void WarpTo(Vector3 targetPosition)
-    {
-        agent.Warp(targetPosition);
-    }
-
-    private void TryWarpToSafety()
-    {
-        foreach (var warpPoint in warpPoints)
-        {
-            if (!Physics.CheckSphere(warpPoint.position, 0.01f))
-            {
-                WarpTo(warpPoint.position);
-                nextEvadeTime = Time.time + evadeCooldown;
-                return;
-            }
-        }
-    }
-
-    private void MaintainDistanceFromPlayer()
-    {
-        if (!isHostile) return;
-
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-        float stopDistance = engageDistance * 0.8f;
-        float backOffDistance = engageDistance * 1.2f;
-
-        if (distanceToPlayer > backOffDistance)
-        {
-            MoveToTarget(playerTransform.position);
-        }
-        else if (distanceToPlayer < stopDistance)
-        {
-            Vector3 directionAwayFromPlayer = (transform.position - playerTransform.position).normalized;
-            Vector3 backAwayPosition = transform.position + directionAwayFromPlayer * 2f;
-            MoveToTarget(backAwayPosition);
-        }
-    }
-
-    // Flag Interaction
 
     private bool ReturnFlag()
     {
@@ -226,6 +172,7 @@ public class AIBehavior : MonoBehaviour
 
         if (IsCloseTo(ownFlagTransform.position, captureDistance))
         {
+
             GameObject flag = GameObject.FindGameObjectWithTag("RedFlag");
             FlagInteraction(flag);
 
@@ -234,12 +181,16 @@ public class AIBehavior : MonoBehaviour
         return false;
     }
 
+    private void MoveToTarget(Vector3 target) => agent.SetDestination(target);
+
     private void FlagInteraction(GameObject flag)
     {
         flag.transform.SetParent(aiFlagSlot);
         flag.transform.localPosition = Vector3.zero;
         flag.transform.localRotation = Quaternion.identity;
     }
+
+    private bool IsCloseTo(Vector3 position, float distance) => Vector3.Distance(transform.position, position) < distance;
 
     private void ResetFlag()
     {
@@ -249,13 +200,10 @@ public class AIBehavior : MonoBehaviour
         }
     }
 
-    // Combat and Shooting
-
     private bool CanShootPlayer()
     {
         return Vector3.Distance(transform.position, playerTransform.position) <= shootingDistance && Time.time >= nextShotTime;
     }
-
     private bool ShootAtPlayer()
     {
         if (CanShootPlayer())
@@ -267,6 +215,52 @@ public class AIBehavior : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    private bool IsPathBlocked(Vector3 targetPosition)
+    {
+        NavMeshPath path = new NavMeshPath();
+        agent.CalculatePath(targetPosition, path);
+        return path.status != NavMeshPathStatus.PathComplete;
+    }
+
+    private bool IsPlayerWithinEngagementDistance()
+    {
+        return Vector3.Distance(transform.position, playerTransform.position) <= engageDistance;
+    }
+
+    private bool BecomeHostile()
+    {
+        isHostile = true;
+        if (Time.time >= nextShotTime && Vector3.Distance(transform.position, playerTransform.position) <= shootingDistance)
+        {
+            StopAndShoot();
+        }
+        else
+        {
+            MoveSideToSide();
+        }
+        MaintainDistanceFromPlayer();
+        return true;
+    }
+    private bool CanEvade() => Time.time >= nextEvadeTime;
+
+    private void TryWarpToSafety()
+    {
+        foreach (var warpPoint in warpPoints)
+        {
+            if (!Physics.CheckSphere(warpPoint.position, 0.01f))
+            {
+                WarpTo(warpPoint.position);
+                nextEvadeTime = Time.time + evadeCooldown;
+                return;
+            }
+        }
+    }
+
+    void WarpTo(Vector3 targetPosition)
+    {
+        agent.Warp(targetPosition);
     }
 
     private void StopAndShoot()
@@ -281,17 +275,11 @@ public class AIBehavior : MonoBehaviour
         }
     }
 
-    private void FacePlayer()
+    IEnumerator ResumeMovementAfterDelay(float delay)
     {
-        Vector3 directionToPlayer = playerTransform.position - transform.position;
-        directionToPlayer.y = 0;
-        Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 20f);
+        yield return new WaitForSeconds(delay);
+        agent.isStopped = false;
     }
-
-    // Evasion and Defensive Maneuvers
-
-    private bool CanEvade() => Time.time >= nextEvadeTime;
 
     private void MoveSideToSide()
     {
@@ -310,25 +298,32 @@ public class AIBehavior : MonoBehaviour
         }
     }
 
-    IEnumerator ResumeMovementAfterDelay(float delay)
+    private void FacePlayer()
     {
-        yield return new WaitForSeconds(delay);
-        agent.isStopped = false;
+        Vector3 directionToPlayer = playerTransform.position - transform.position;
+        directionToPlayer.y = 0;
+        Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 20f);
     }
 
-    // Utility and Miscellaneous
-
-    private bool IsPathBlocked(Vector3 targetPosition)
+    private void MaintainDistanceFromPlayer()
     {
-        NavMeshPath path = new NavMeshPath();
-        agent.CalculatePath(targetPosition, path);
-        return path.status != NavMeshPathStatus.PathComplete;
-    }
 
-    private bool IsPlayerWithinEngagementDistance()
-    {
-        return Vector3.Distance(transform.position, playerTransform.position) <= engageDistance;
-    }
+        if (!isHostile) return;
 
-    #endregion
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+        float stopDistance = engageDistance * 0.8f;
+        float backOffDistance = engageDistance * 1.2f;
+
+        if (distanceToPlayer > backOffDistance)
+        {
+            MoveToTarget(playerTransform.position);
+        }
+        else if (distanceToPlayer < stopDistance)
+        {
+            Vector3 directionAwayFromPlayer = (transform.position - playerTransform.position).normalized;
+            Vector3 backAwayPosition = transform.position + directionAwayFromPlayer * 2f;
+            MoveToTarget(backAwayPosition);
+        }
+    }
 }
