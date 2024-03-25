@@ -4841,6 +4841,7 @@ GameObject:
   - component: {fileID: 4940366950808139102}
   - component: {fileID: 4466281698746356585}
   - component: {fileID: 8155180005453128194}
+  - component: {fileID: 5618536252333550824}
   m_Layer: 0
   m_Name: AIBullet
   m_TagString: AiProjectile
@@ -4962,3 +4963,15 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5618536252333550824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3463417239221956300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cb5470266791684b82f78562a6c35a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

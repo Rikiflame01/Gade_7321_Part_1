@@ -29,8 +29,6 @@ public class FlagSystem : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("RedFlag"))
         {
-            Debug.Log("Red Flag Touched");
-            //collision.gameObject.transform.position = redFlagSpawnPoint.transform.position;
             GameEventSystem.ResetFlag(collision.gameObject);
         }
     }

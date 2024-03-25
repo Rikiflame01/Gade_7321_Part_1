@@ -2,14 +2,21 @@ using UnityEngine;
 using UnityEngine.AI;
 using TMPro;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class RoundController : MonoBehaviour
 {
+    public GameObject WinCanvas;
+    public GameObject LoseCanvas;
+
     public Transform playerStartTransform;
     public Transform aiStartTransform;
 
     public int countdownTime = 3;
     public TextMeshProUGUI countdownDisplay;
+
+    public int currentRound = 1;
+    public TextMeshProUGUI currentRoundDisplay;
 
     public Transform RedFlagSpawn;
     public Transform BlueFlagSpawn;
@@ -29,14 +36,20 @@ public class RoundController : MonoBehaviour
 
     void OnEnable()
     {
+        GameEventSystem.OnCharacterReset += ResetCharacterPosition;
         GameEventSystem.OnRoundReset += ResetRoundPositions;
         GameEventSystem.OnScoreUpdated += UpdateScoreDisplay;
+        GameEventSystem.OnAIWin += AIWins;
+        GameEventSystem.OnPlayerWin += PlayerWins;
     }
 
     void OnDisable()
     {
+        GameEventSystem.OnCharacterReset -= ResetCharacterPosition;
         GameEventSystem.OnRoundReset -= ResetRoundPositions;
         GameEventSystem.OnScoreUpdated -= UpdateScoreDisplay;
+        GameEventSystem.OnAIWin -= AIWins;
+        GameEventSystem.OnPlayerWin -= PlayerWins;
     }
 
     private void ResetRoundPositions()
@@ -57,6 +70,9 @@ public class RoundController : MonoBehaviour
 
     private void UpdateScoreDisplay(int playerScore, int aiScore)
     {
+        currentRound++;
+        currentRoundDisplay.text = currentRound.ToString();
+
         // Directly trigger the static event to update UI elements with new scores
         GameEventSystem.ScoreCanvasUpdated(playerScore, aiScore);
     }
@@ -93,12 +109,43 @@ public class RoundController : MonoBehaviour
 
         countdownDisplay.text = "GO!";
 
-        // Enable player and AI movement here
         player.GetComponent<PlayerMovement>().enabled = true;
         ai.GetComponent<AIBehavior>().enabled = true;
 
         yield return new WaitForSeconds(1f);
         countdownDisplay.gameObject.SetActive(false);
+    }
+
+    private void ResetCharacterPosition(GameObject character) 
+    {
+        if (character.tag == "AI")
+        {
+            RedFlag.transform.SetParent(null);
+            ai.GetComponent<NavMeshAgent>().Warp(aiStartTransform.position);
+        }
+        if (character.tag == "Player")
+        {
+            BlueFlag.transform.SetParent(null);
+            player.GetComponent<NavMeshAgent>().Warp(playerStartTransform.position);
+        }
+
+           
+    }
+
+    private void AIWins() 
+    {
+        player.GetComponent<PlayerMovement>().enabled = false;
+        ai.GetComponent<AIBehavior>().enabled = false;
+        LoseCanvas.SetActive(true);
+
+    }
+
+    private void PlayerWins()
+    {
+        player.GetComponent<PlayerMovement>().enabled = false;
+        ai.GetComponent<AIBehavior>().enabled = false;
+        WinCanvas.SetActive(true);
+        
     }
 }
 

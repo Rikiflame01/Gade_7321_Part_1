@@ -3,12 +3,14 @@ using UnityEngine.InputSystem;
 
 public class PlayerShoot : MonoBehaviour
 {
-    public GameObject projectilePrefab; 
+    public GameObject projectilePrefab;
     public Transform shootingPoint;
-    public Camera playerCamera; 
+    public Camera playerCamera;
 
     private PlayerControls playerInput;
     private InputAction shootAction;
+    private float shootCooldown = 5.0f; 
+    private float nextShootTime = 0f; 
 
     private void Awake()
     {
@@ -30,20 +32,24 @@ public class PlayerShoot : MonoBehaviour
 
     private void OnShoot(InputAction.CallbackContext context)
     {
-        ShootProjectile();
+        if (Time.time >= nextShootTime)
+        {
+            ShootProjectile();
+            nextShootTime = Time.time + shootCooldown;
+        }
     }
 
     private void ShootProjectile()
     {
         if (projectilePrefab && shootingPoint)
         {
-            GameObject projectile = Instantiate(projectilePrefab, shootingPoint.position, Quaternion.identity);
+            GameObject projectile = Instantiate(projectilePrefab, shootingPoint.position, Quaternion.LookRotation(playerCamera.transform.forward));
             Rigidbody projectileRigidbody = projectile.GetComponent<Rigidbody>();
 
             if (projectileRigidbody != null)
             {
                 Vector3 shootingDirection = playerCamera.transform.forward;
-                projectileRigidbody.AddForce(shootingDirection * 1000); 
+                projectileRigidbody.AddForce(shootingDirection * 500);
             }
         }
     }

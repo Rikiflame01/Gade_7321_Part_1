@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
@@ -8,6 +9,7 @@ public class ScoreManager : MonoBehaviour
     void OnEnable()
     {
         GameEventSystem.OnFlagCaptured += HandleFlagCapture;
+
     }
 
     void OnDisable()
@@ -20,11 +22,28 @@ public class ScoreManager : MonoBehaviour
         // Increment score based on who captured the flag
         if (scorer.CompareTag("Player"))
         {
-            playerScore++;
+            if (playerScore < 5)
+            {
+                playerScore++;
+                if (playerScore == 5)
+                {
+                    GameEventSystem.PlayerWin();
+                }
+            }
+
         }
         else if (scorer.CompareTag("AI"))
         {
-            aiScore++;
+            if (aiScore < 5)
+            {
+                aiScore++;
+                if (aiScore == 5)
+                {
+                    GameEventSystem.AIWin();
+                }
+            }
+
+            
         }
 
         // Directly trigger the static events to update the score and reset the round

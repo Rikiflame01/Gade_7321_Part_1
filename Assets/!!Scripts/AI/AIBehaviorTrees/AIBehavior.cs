@@ -35,6 +35,8 @@ public class AIBehavior : MonoBehaviour
 
     private GameObject detectedProjectile;
 
+    public Transform warpPointOne;
+    public Transform warpPointTwo;
 
     void Start()
     {
@@ -65,11 +67,13 @@ public class AIBehavior : MonoBehaviour
     {
         if (other.gameObject.CompareTag("PlayerProjectile"))
         {
+            Debug.Log("AI detected player projectile.");
+
             detectedProjectile = other.gameObject; // Assign the detected projectile
                                                    // Trigger evade behavior if within evade cooldown
             if (CanEvade())
             {
-                StartCoroutine(EvadeAttack(detectedProjectile));
+                TryWarpToSafety();
             }
         }
     }
@@ -229,7 +233,7 @@ public class AIBehavior : MonoBehaviour
         isHostile = true;
         if (CanEvade() && detectedProjectile != null)
         {
-            EvadeAttack(detectedProjectile);
+            TryWarpToSafety();
         }
         else if (Time.time >= nextShotTime)
         {
@@ -261,25 +265,33 @@ public class AIBehavior : MonoBehaviour
 
     private bool CanEvade() => Time.time >= nextEvadeTime;
 
-    private IEnumerator EvadeAttack(GameObject incomingProjectile)
+    void TryWarpToSafety()
     {
-        nextEvadeTime = Time.time + evadeCooldown;
+        float checkRadius = 0.01f;
 
-        Vector3 evadeDirection = GetEvadeDirection(incomingProjectile.transform.forward);
-        Vector3 evadeTarget = transform.position + evadeDirection * 5f; // Adjust evade distance as needed
-
-        NavMeshPath path = new NavMeshPath();
-        if (agent.CalculatePath(evadeTarget, path) && path.status == NavMeshPathStatus.PathComplete)
+        if (!Physics.CheckSphere(warpPointOne.position, checkRadius))
         {
-            agent.SetDestination(evadeTarget);
-            yield return new WaitForSeconds(1f); // Wait time after evading before next action
+            WarpTo(warpPointOne.position);
+            // Apply cooldown after successful warp
+            nextEvadeTime = Time.time + evadeCooldown;
+        }
+        else if (!Physics.CheckSphere(warpPointTwo.position, checkRadius))
+        {
+            WarpTo(warpPointTwo.position);
+            // Apply cooldown after successful warp
+            nextEvadeTime = Time.time + evadeCooldown;
+        }
+        else
+        {
+            Debug.Log("No safe warp points available.");
         }
     }
 
-    private Vector3 GetEvadeDirection(Vector3 projectileDirection)
+    void WarpTo(Vector3 targetPosition)
     {
-        Vector3 perpendicular = Vector3.Cross(projectileDirection, Vector3.up);
-        return Random.value < 0.5f ? perpendicular : -perpendicular;
+        agent.Warp(targetPosition); // For NavMeshAgent
+                                    // Or simply set the position for non-NavMesh agents:
+                                    // transform.position = targetPosition;
     }
 
     private void StopAndShoot()
@@ -319,7 +331,7 @@ public class AIBehavior : MonoBehaviour
             Vector3 sideStepDirection = Random.value < 0.5f ? transform.right : -transform.right;
             Vector3 targetPosition = transform.position + sideStepDirection * 2f; 
             agent.SetDestination(targetPosition);
-            yield return new WaitForSeconds(Random.Range(1f, 3f)); // Random interval between moves
+            yield return new WaitForSeconds(Random.Range(1f, 3f));
         }
     }
 
@@ -352,7 +364,6 @@ public class AIBehavior : MonoBehaviour
         {
             flag.transform.SetParent(null);
             flag.transform.position = redFlagSpawnTransform.position;
-            Debug.Log("AI Flag reset.");
         }
 
     }

@@ -5,7 +5,7 @@ public class ObjectActivationTrigger : MonoBehaviour
 {
     public GameObject[] objectsToActivate;
     public float activationDelay = 1.5f;
-    public float activeDuration = 30f;
+    public float activeDuration = 15f;
 
     private bool playerInside = false;
     private bool aiInside = false;
@@ -38,11 +38,15 @@ public class ObjectActivationTrigger : MonoBehaviour
             aiInside = false;
         }
 
-        // If either leaves, stop trying to activate the objects
-        if (activationCoroutine != null)
+        // If either leaves, consider deactivating the objects immediately or after a delay
+        if (!playerInside || !aiInside)
         {
-            StopCoroutine(activationCoroutine);
-            activationCoroutine = null;
+            if (activationCoroutine != null)
+            {
+                StopCoroutine(activationCoroutine);
+                activationCoroutine = null;
+            }
+            DeactivateObjects(); // Call DeactivateObjects to ensure objects are turned off if one leaves early
         }
     }
 
@@ -73,6 +77,14 @@ public class ObjectActivationTrigger : MonoBehaviour
         yield return new WaitForSeconds(activeDuration);
 
         // Deactivate the objects
+        DeactivateObjects();
+
+        // Reset the coroutine tracker
+        activationCoroutine = null;
+    }
+
+    private void DeactivateObjects()
+    {
         foreach (GameObject obj in objectsToActivate)
         {
             if (obj != null)
@@ -80,8 +92,5 @@ public class ObjectActivationTrigger : MonoBehaviour
                 obj.SetActive(false);
             }
         }
-
-        // Reset the coroutine tracker
-        activationCoroutine = null;
     }
 }
