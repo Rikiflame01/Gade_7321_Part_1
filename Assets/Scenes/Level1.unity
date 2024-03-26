@@ -6390,6 +6390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 007dea9b16453ed48b94ce8240e069bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ResetSFX: {fileID: 8300000, guid: 8a70364f9832b744bb16da20c47f650c, type: 3}
   WinCanvas: {fileID: 118871419}
   LoseCanvas: {fileID: 573540118}
   playerStartTransform: {fileID: 362806900}
@@ -6997,6 +6998,7 @@ MonoBehaviour:
   howToPlayCanvas: {fileID: 0}
   winCanvas: {fileID: 118871419}
   loseCanvas: {fileID: 573540118}
+  buttonClickSFX: {fileID: 8300000, guid: 85890f71a0b794842a11665472e6be87, type: 3}
 --- !u!4 &557800073
 Transform:
   m_ObjectHideFlags: 0
@@ -7107,6 +7109,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 742552384}
   isPaused: 0
+  buttonClickSFX: {fileID: 8300000, guid: c5df6db2221b6e843930a6cce4679163, type: 3}
 --- !u!4 &600199404
 Transform:
   m_ObjectHideFlags: 0
@@ -7562,6 +7565,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71f5a6c52964d914790c1385281f6200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerShootSFX: {fileID: 8300000, guid: 84256083dae287c448bb7ebd421ef8f0, type: 3}
   projectilePrefab: {fileID: 3463417239221956300, guid: 04d90d9d813c56840a67590990f48f68,
     type: 3}
   shootingPoint: {fileID: 182766096}
@@ -8303,6 +8307,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 600199403}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Resume
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &844807883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8427,6 +8443,18 @@ MonoBehaviour:
       - m_Target: {fileID: 557800072}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: PlayGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 600199403}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Resume
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9362,6 +9390,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 600199403}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Resume
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1337686761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9664,6 +9704,7 @@ MonoBehaviour:
   shootingDistance: 5
   shootingCooldown: 5
   evadeCooldown: 10
+  attackSFX: {fileID: 8300000, guid: 84256083dae287c448bb7ebd421ef8f0, type: 3}
   warpPoints:
   - {fileID: 1969691063}
   - {fileID: 148833283}
@@ -9949,6 +9990,18 @@ MonoBehaviour:
       - m_Target: {fileID: 557800072}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: PlayGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 600199403}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Resume
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10624,6 +10677,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e4dad392fb101145a4358337c7232be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AIWinsSFX: {fileID: 8300000, guid: 31460e5f663bc414ca0167412467bf1e, type: 3}
+  PlayerWinsSFX: {fileID: 8300000, guid: 15b3eda55c3b07f4b8d373b0f5487a51, type: 3}
 --- !u!4 &1708270944
 Transform:
   m_ObjectHideFlags: 0
@@ -12227,6 +12282,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 600199403}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Resume
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2006393629
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12516,6 +12583,18 @@ MonoBehaviour:
       - m_Target: {fileID: 557800072}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
         m_MethodName: PlayGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 600199403}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Resume
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

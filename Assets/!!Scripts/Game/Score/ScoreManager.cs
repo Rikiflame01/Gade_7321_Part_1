@@ -8,6 +8,9 @@ public class ScoreManager : MonoBehaviour
     private int playerScore = 0;
     private int aiScore = 0;
 
+    [SerializeField] private AudioClip AIWinsSFX;
+    [SerializeField] private AudioClip PlayerWinsSFX;
+
     void OnEnable()
     {
         GameEventSystem.OnFlagCaptured += HandleFlagCapture;
@@ -26,6 +29,7 @@ public class ScoreManager : MonoBehaviour
             if (playerScore < 5)
             {
                 playerScore++;
+                AudioManager.Instance.PlaySFX(PlayerWinsSFX, 3);
                 if (playerScore == 5)
                 {
                     GameEventSystem.PlayerWin();
@@ -38,6 +42,7 @@ public class ScoreManager : MonoBehaviour
             if (aiScore < 5)
             {
                 aiScore++;
+                AudioManager.Instance.PlaySFX(AIWinsSFX, 3);
                 if (aiScore == 5)
                 {
                     GameEventSystem.AIWin();

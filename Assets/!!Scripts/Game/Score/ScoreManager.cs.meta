@@ -3,7 +3,9 @@ guid: 4e4dad392fb101145a4358337c7232be
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - AIWinsSFX: {fileID: 8300000, guid: 31460e5f663bc414ca0167412467bf1e, type: 3}
+  - PlayerWinsSFX: {fileID: 8300000, guid: 15b3eda55c3b07f4b8d373b0f5487a51, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

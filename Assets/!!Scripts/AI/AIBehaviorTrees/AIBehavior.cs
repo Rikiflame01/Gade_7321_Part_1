@@ -35,6 +35,8 @@ public class AIBehavior : MonoBehaviour
     private bool shouldFacePlayer = false;
 
     private GameObject detectedProjectile;
+    [SerializeField] private AudioClip attackSFX;
+
 
     public Transform[] warpPoints;
     #endregion
@@ -212,6 +214,7 @@ public class AIBehavior : MonoBehaviour
             nextShotTime = Time.time + shootingCooldown;
             GameObject projectile = Instantiate(projectilePrefab, shootingPoint.position, Quaternion.LookRotation(playerTransform.position - shootingPoint.position));
             projectile.GetComponent<Rigidbody>().velocity = (playerTransform.position - shootingPoint.position).normalized * 20f;
+            AudioManager.Instance.PlaySFX(attackSFX, 3);
             return true;
         }
         return false;

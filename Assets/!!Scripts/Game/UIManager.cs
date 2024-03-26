@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI; 
 
@@ -9,6 +10,7 @@ public class UIManager : MonoBehaviour
     public GameObject howToPlayCanvas;
     public GameObject winCanvas;
     public GameObject loseCanvas;
+    [SerializeField] private AudioClip buttonClickSFX;
 
     private void Start()
     {
@@ -36,6 +38,7 @@ public class UIManager : MonoBehaviour
     {
         if (howToPlayCanvas != null)
         {
+            AudioManager.Instance.PlaySFX(buttonClickSFX, 2);
             howToPlayCanvas.SetActive(true);
         }
     }
@@ -44,22 +47,26 @@ public class UIManager : MonoBehaviour
     {
         if (howToPlayCanvas != null)
         {
+            AudioManager.Instance.PlaySFX(buttonClickSFX, 2);
             howToPlayCanvas.SetActive(false);
         }
     }
 
     public void PlayGame()
     {
+        AudioManager.Instance.PlaySFX(buttonClickSFX, 2);
         SceneManager.LoadScene("Level1");
     }
 
     public void GoToMainMenu()
     {
+        AudioManager.Instance.PlaySFX(buttonClickSFX, 2);
         SceneManager.LoadScene("MainMenu");
     }
 
     public void QuitGame()
     {
+        AudioManager.Instance.PlaySFX(buttonClickSFX, 2);
         Application.Quit();
     }
 
@@ -67,6 +74,7 @@ public class UIManager : MonoBehaviour
     {
         if (winCanvas != null)
         {
+            AudioManager.Instance.PlaySFX(buttonClickSFX, 2);
             winCanvas.SetActive(true);
         }
     }
@@ -75,6 +83,7 @@ public class UIManager : MonoBehaviour
     {
         if (loseCanvas != null)
         {
+            AudioManager.Instance.PlaySFX(buttonClickSFX, 2);
             loseCanvas.SetActive(true);
         }
     }

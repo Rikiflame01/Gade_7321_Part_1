@@ -9,10 +9,15 @@ using Unity.VisualScripting;
  * * * It is used to manage the countdown to start the round, 
  * * * reset the character positions, update the score, reset the flag, and handle the win conditions.
  * * */
+
+
 public class RoundController : MonoBehaviour
 {
 
     #region Dependencies
+
+    [SerializeField] private AudioClip ResetSFX;
+
     public GameObject WinCanvas;
     public GameObject LoseCanvas;
 
@@ -67,6 +72,7 @@ public class RoundController : MonoBehaviour
     #region Private Methods
     private void ResetRoundPositions()
     {
+        AudioManager.Instance.PlaySFX(ResetSFX, 3);
         player.GetComponent<NavMeshAgent>().Warp(playerStartTransform.position);
         ai.GetComponent<NavMeshAgent>().Warp(aiStartTransform.position);
         BlueFlag.transform.SetParent(null);
@@ -132,11 +138,13 @@ public class RoundController : MonoBehaviour
     {
         if (character.tag == "AI")
         {
+            AudioManager.Instance.PlaySFX(ResetSFX, 3);
             RedFlag.transform.SetParent(null);
             ai.GetComponent<NavMeshAgent>().Warp(aiStartTransform.position);
         }
         if (character.tag == "Player")
         {
+            AudioManager.Instance.PlaySFX(ResetSFX, 3);
             BlueFlag.transform.SetParent(null);
             player.GetComponent<NavMeshAgent>().Warp(playerStartTransform.position);
         }
@@ -148,11 +156,13 @@ public class RoundController : MonoBehaviour
     {
         if (flag.tag == "RedFlag")
         {
+            AudioManager.Instance.PlaySFX(ResetSFX, 3);
             flag.transform.SetParent(null);
             flag.transform.position = RedFlagSpawn.position;
         }
         if (flag.tag == "BlueFlag")
         {
+            AudioManager.Instance.PlaySFX(ResetSFX, 3);
             flag.transform.SetParent(null);
             flag.transform.position = BlueFlagSpawn.position;
         }

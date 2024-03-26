@@ -7,6 +7,8 @@ public class PauseMenu : MonoBehaviour
     public GameObject pauseMenuUI;
     public bool isPaused = false;
 
+    [SerializeField] private AudioClip buttonClickSFX;
+
     // This script is responsible for pausing the game and displaying the pause menu.
 
     private void Update()
@@ -15,7 +17,7 @@ public class PauseMenu : MonoBehaviour
         {
             try
             {
-                //SFXManager.Instance.PlaySFX(SFXManager.Instance.pause, 2);
+                AudioManager.Instance.PlaySFX(buttonClickSFX, 3);
             }
             catch (System.Exception e)
             {

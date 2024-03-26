@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 public class PlayerShoot : MonoBehaviour
 {
     #region Dependencies
+    [SerializeField] private AudioClip playerShootSFX;
+
     public GameObject projectilePrefab;
     public Transform shootingPoint;
     public Camera playerCamera;
@@ -43,6 +45,7 @@ public class PlayerShoot : MonoBehaviour
         if (Time.time >= nextShootTime)
         {
             ShootProjectile();
+            AudioManager.Instance.PlaySFX(playerShootSFX, 3);
             nextShootTime = Time.time + shootCooldown;
         }
     }
